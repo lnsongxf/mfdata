@@ -1,11 +1,55 @@
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-from matplotlib import rcParams
 from fredapi import Fred
-from itertools import cycle
 from mfdata.utils import *
 from mfdata.dates import *
+
+
+class ts:
+
+    def __init__(self, frequency, unit, multiplier, currency, idenfier, value):
+        self.frequency = frequency
+        self.unit = unit
+        self.multiplier
+        self.currency
+        self.idenfier
+        self.value
+
+
+class page(ts):
+
+    def __init__(self, country, sa, value, surface: int = 0):
+        super(page, self).__init__()
+        self.country = country
+        self.sa = sa
+        self.value = value
+        self.surface = surface # the larger the number, 
+
+
+class frb_h8(page):
+    '''
+    Class designed for preparing data from Federal Reserve Board H8 table.
+    The class has layers of data that is specified in the H8 table and can
+    store data of different categories.
+
+    '''
+
+    def __init__(self,
+                 filepath: list):
+        super(page, self).__init__()
+        self.filepath = filepath
+
+        for path in filepath:
+            df = pd.read_csv(path)
+            col_names = df.columns
+            self. = col_names[1].split('')
+
+    def parse(self):
+        '''
+        Parse the information in the H8 table provided by the filepath into
+        series. If there are multiple items in filepath, each table will be
+        parsed into series with their own metadata.
+        '''
 
 
 class database:
@@ -49,19 +93,3 @@ class database:
             ts.name = var
             ts_list.append(ts)
         return pd.concat(ts_list, axis=1)
-
-
-class frb_h8:
-    '''
-    Class designed for preparing data from Federal Reserve Board H8 table.
-
-    '''
-
-        def __init__(self,
-                     category: str = 'domestic',
-                     filepath):
-            self.category = category
-            self.filepath = filepath
-
-        def fetch(self):
-            if len()
