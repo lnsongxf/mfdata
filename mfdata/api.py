@@ -8,7 +8,6 @@ from mfdata.dates import *
 class ts:
 
     def __init__(self,
-                 frequency=None,
                  unit: str,
                  multiplier: int,
                  currency: str,
@@ -16,7 +15,6 @@ class ts:
                  surface: int,
                  family: list,
                  value):
-        self.frequency = frequency
         self.unit = unit
         self.multiplier = multiplier
         self.currency = currency
