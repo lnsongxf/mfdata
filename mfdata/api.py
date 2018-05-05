@@ -7,23 +7,34 @@ from mfdata.dates import *
 
 class ts:
 
-    def __init__(self, frequency, unit, multiplier, currency, idenfier, value):
+    def __init__(self,
+                 frequency: str,
+                 unit: str,
+                 multiplier: int,
+                 currency: str,
+                 idenfier: str,
+                 surface: int,
+                 value):
         self.frequency = frequency
         self.unit = unit
         self.multiplier
         self.currency
         self.idenfier
+        self.surface
         self.value
 
 
 class page(ts):
 
-    def __init__(self, country, sa, value, surface: int = 0):
-        super(page, self).__init__()
-        self.country = country
-        self.sa = sa
+    def __init__(self,
+                 category: str,
+                 sa: str,
+                 value):
+        super().__init__(frequency, unit, multiplier,
+                         currency, idenfier, surface, value)
+        self.category = category
+        self.sa = sa  # seasonally-adjusted?
         self.value = value
-        self.surface = surface # the larger the number, 
 
 
 class frb_h8(page):
@@ -36,13 +47,14 @@ class frb_h8(page):
 
     def __init__(self,
                  filepath: list):
-        super(page, self).__init__()
+        super().__init__(category, sa, value)
         self.filepath = filepath
 
         for path in filepath:
             df = pd.read_csv(path)
             col_names = df.columns
-            self. = col_names[1].split('')
+            self.category, self.sa = col_names[1].split(',')[-2:]
+
 
     def parse(self):
         '''
