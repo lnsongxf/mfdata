@@ -16,14 +16,14 @@ class ts:
                  surface: int,
                  family: list,
                  value):
-        self.frequency = None
+        self.frequency = frequency
         self.unit = unit
-        self.multiplier
-        self.currency
-        self.idenfier
-        self.surface
-        self.family
-        self.value
+        self.multiplier = multiplier
+        self.currency = currency
+        self.idenfier = idenfier
+        self.surface = surface
+        self.family = family
+        self.value = value
 
 
 class page(object):
@@ -77,12 +77,14 @@ class frb_h8(object):
                 value = df.loc[5:, [col_names[0], col]]
                 value.columns = ['Date', family[surface]]
                 value.set_index('Date', inplace=True)
-                
 
                 ts_list.append(ts(unit=unit, multiplier=multiplier,
                                   currency=currency, idenfier=idenfier,
                                   surface=surface, family=family,
                                   value=value))
+            df = pd.concat(ts_list, )
+
+            self.pages.append()
 
 
 class database:
