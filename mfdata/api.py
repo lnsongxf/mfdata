@@ -5,20 +5,20 @@ from mfdata.utils import *
 from mfdata.dates import *
 
 
-class ts:
+class ts(object):
 
     def __init__(self,
                  unit: str,
                  multiplier: int,
                  currency: str,
-                 idenfier: str,
+                 UI: str,
                  surface: int,
                  family: list,
                  value):
         self.unit = unit
         self.multiplier = multiplier
         self.currency = currency
-        self.idenfier = idenfier
+        self.UI = UI
         self.surface = surface
         self.family = family
         self.value = value
@@ -70,19 +70,18 @@ class frb_h8(object):
                                     col].values[0]
                 currency = df.loc[df[col_names[0]] == 'Currency:',
                                   col].values[0]
-                idenfier = df.loc[df[col_names[0]] ==
-                                  'Unique Identifier: ', col].values[0]
+                UI = df.loc[df[col_names[0]] ==
+                            'Unique Identifier: ', col].values[0]
                 value = df.loc[5:, [col_names[0], col]]
                 value.columns = ['Date', family[surface]]
                 value.set_index('Date', inplace=True)
 
                 ts_list.append(ts(unit=unit, multiplier=multiplier,
-                                  currency=currency, idenfier=idenfier,
+                                  currency=currency, UI=UI,
                                   surface=surface, family=family,
                                   value=value))
-            df = pd.concat(ts_list, )
-
-            self.pages.append()
+            pg = page(category=category, sa=sa, value=ts_list)
+            self.pages.append(pg)
 
 
 class database:
