@@ -66,7 +66,7 @@ class frb_h8(object):
             df = pd.read_csv(path)
             col_names = df.columns
             category, sa = col_names[1].split(',')[-2:]
-            category = category.strip()
+            category = category.strip().title()
 
             if sa.split(' ')[1] == 'not':
                 sa = 'NSA'
@@ -106,9 +106,12 @@ class frb_h8(object):
     def list(self):
         for page in self.pages:
             page_header = page.category + ', ' + page.sa
+            tsname_list = ['{}: {}{}'.format(ts.UI, ts.surface * '\t', ts.name)
+                           for ts in page.value]
+            page_body = '\n'.join(tsname_list)
+
             print(color.BOLD + color.RED + page_header + color.END)
-            print('\n'.join('{}: {}'.format(ts.UI, ts.name)
-                            for ts in page.value))
+            print(page_body)
             print('\n')
 
 
