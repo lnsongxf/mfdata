@@ -22,6 +22,7 @@ class ts(object):
         self.surface = surface
         self.family = family
         self.value = value
+        self.name = family[surface]
 
 
 class page(object):
@@ -46,6 +47,16 @@ class frb_h8(object):
 
     def __init__(self,
                  filepath: list):
+        '''
+        At initialization, data is parsed into time series objects
+        categorized by the type of institutions, and aggregated as
+        a book of pages. Each time serie records the metadata such
+        as the unit of measure, currency, and the unique identifier
+        of the serie.
+
+        Raw data will further be transformed into easy-to-use format
+        such as Dataframe using functions defined as methods.
+        '''
 
         self.filepath = filepath
         self.pages = []
@@ -55,23 +66,32 @@ class frb_h8(object):
             df = pd.read_csv(path)
             col_names = df.columns
             category, sa = col_names[1].split(',')[-2:]
+            category = category.strip()
 
             if sa.split(' ')[1] == 'not':
-                sa = 'nsa'
+                sa = 'NSA'
             else:
-                sa = 'sa'
+                sa = 'SA'
 
             ts_list = []
             for col in col_names[1:]:
                 family = col.split(',')[0].split(':')
+                family = list(map(lambda x: x.strip(), family))
+
                 surface = len(family) - 1
+
                 unit = df.loc[df[col_names[0]] == 'Unit:', col].values[0]
+
                 multiplier = df.loc[df[col_names[0]] == 'Multiplier:',
                                     col].values[0]
+
                 currency = df.loc[df[col_names[0]] == 'Currency:',
                                   col].values[0]
+
                 UI = df.loc[df[col_names[0]] ==
                             'Unique Identifier: ', col].values[0]
+                UI = UI.split('/')[-1]
+
                 value = df.loc[5:, [col_names[0], col]]
                 value.columns = ['Date', family[surface]]
                 value.set_index('Date', inplace=True)
@@ -82,6 +102,14 @@ class frb_h8(object):
                                   value=value))
             pg = page(category=category, sa=sa, value=ts_list)
             self.pages.append(pg)
+
+    def list(self):
+        for page in self.pages:
+            page_header = page.category + ', ' + page.sa
+            print(color.BOLD + color.RED + page_header + color.END)
+            print('\n'.join('{}: {}'.format(ts.UI, ts.name)
+                            for ts in page.value))
+            print('\n')
 
 
 class database:
