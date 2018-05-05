@@ -8,36 +8,37 @@ from mfdata.dates import *
 class ts:
 
     def __init__(self,
-                 frequency: str,
+                 frequency=None,
                  unit: str,
                  multiplier: int,
                  currency: str,
                  idenfier: str,
                  surface: int,
+                 family: list,
                  value):
-        self.frequency = frequency
+        self.frequency = None
         self.unit = unit
         self.multiplier
         self.currency
         self.idenfier
         self.surface
+        self.family
         self.value
 
 
-class page(ts):
+class page(object):
 
     def __init__(self,
                  category: str,
                  sa: str,
                  value):
-        super().__init__(frequency, unit, multiplier,
-                         currency, idenfier, surface, value)
+
         self.category = category
         self.sa = sa  # seasonally-adjusted?
         self.value = value
 
 
-class frb_h8(page):
+class frb_h8(object):
     '''
     Class designed for preparing data from Federal Reserve Board H8 table.
     The class has layers of data that is specified in the H8 table and can
@@ -47,21 +48,41 @@ class frb_h8(page):
 
     def __init__(self,
                  filepath: list):
-        super().__init__(category, sa, value)
+
         self.filepath = filepath
+        self.pages = []
 
         for path in filepath:
+
             df = pd.read_csv(path)
             col_names = df.columns
-            self.category, self.sa = col_names[1].split(',')[-2:]
+            category, sa = col_names[1].split(',')[-2:]
 
+            if sa.split(' ')[1] == 'not':
+                sa = 'nsa'
+            else:
+                sa = 'sa'
 
-    def parse(self):
-        '''
-        Parse the information in the H8 table provided by the filepath into
-        series. If there are multiple items in filepath, each table will be
-        parsed into series with their own metadata.
-        '''
+            ts_list = []
+            for col in col_names[1:]:
+                family = col.split(',')[0].split(':')
+                surface = len(family) - 1
+                unit = df.loc[df[col_names[0]] == 'Unit:', col].values[0]
+                multiplier = df.loc[df[col_names[0]] == 'Multiplier:',
+                                    col].values[0]
+                currency = df.loc[df[col_names[0]] == 'Currency:',
+                                  col].values[0]
+                idenfier = df.loc[df[col_names[0]] ==
+                                  'Unique Identifier: ', col].values[0]
+                value = df.loc[5:, [col_names[0], col]]
+                value.columns = ['Date', family[surface]]
+                value.set_index('Date', inplace=True)
+                
+
+                ts_list.append(ts(unit=unit, multiplier=multiplier,
+                                  currency=currency, idenfier=idenfier,
+                                  surface=surface, family=family,
+                                  value=value))
 
 
 class database:
@@ -83,12 +104,7 @@ class database:
         if self.key is None:
             import textwrap
             raise ValueError(textwrap.dedent("""\
-                    You need to set a valid API key. You can set it in 3 ways:
-                    pass the string with api_key, or set api_key_file to a
-                    file with the api key in the first line, or set the
-                    environment variable 'FRED_API_KEY' to the value of your
-                    api key. You can sign up for a free api key on the Fred
-                    website at http://research.stlouisfed.org/fred2/"""))
+                    You need to set a valid API key."""))
 
         if self.database is not 'fred':
             import textwrap
