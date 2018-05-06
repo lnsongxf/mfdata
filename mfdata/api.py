@@ -160,7 +160,7 @@ class database(object):
         self.var_list = var_list  # for simple request in FRED
         self.key = key  # the form depends on the database we use
 
-    def fetch_fred(self):
+    def fetch(self):
         '''
         Fetch data from FRED by names given in a list called var_list
 
