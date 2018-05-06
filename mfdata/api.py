@@ -97,6 +97,7 @@ class frb_h8(dates, plot):
                 value = df.loc[5:, [col_names[0], col]]
                 value.columns = ['Date', family[surface]]
                 value['Date'] = pd.to_datetime(value['Date'], yearfirst=True)
+                value[family[surface]] = value[family[surface]].astype(float)
                 value.set_index('Date', inplace=True)
 
                 ts_list.append(ts(unit=unit, multiplier=multiplier,
@@ -132,6 +133,21 @@ class frb_h8(dates, plot):
             df_list.append(ts)
         df = pd.concat(df_list, axis=1)
         return df
+
+
+class dtcc_repo(dates, plot):
+
+    def __init__(self, filepath: str):
+
+        super(dtcc_repo, self).__init__()
+
+        self.filepath = filepath
+        GCF = pd.read_excel(filepath, skiprows=6)
+        GCF.Date = pd.to_datetime(GCF.Date, yearfirst=True)
+        GCF.set_index('Date', inplace=True)
+        GCF = GCF[list(GCF)[:3]]
+        GCF.columns = ['Repo: MBS', 'Repo: Treasury', 'Repo: Agency']
+        self.value = GCF
 
 
 class database(object):
