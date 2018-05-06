@@ -37,7 +37,7 @@ class page(object):
         self.value = value
 
 
-class frb_h8(object):
+class frb_h8(dates, plot):
     '''
     Class designed for preparing data from Federal Reserve Board H8 table.
     The class has layers of data that is specified in the H8 table and can
@@ -57,6 +57,8 @@ class frb_h8(object):
         Raw data will further be transformed into easy-to-use format
         such as Dataframe using functions defined as methods.
         '''
+
+        super(frb_h8, self).__init__()
 
         self.filepath = filepath
         self.pages = []
@@ -94,6 +96,7 @@ class frb_h8(object):
 
                 value = df.loc[5:, [col_names[0], col]]
                 value.columns = ['Date', family[surface]]
+                value['Date'] = pd.to_datetime(value['Date'], yearfirst=True)
                 value.set_index('Date', inplace=True)
 
                 ts_list.append(ts(unit=unit, multiplier=multiplier,
@@ -114,8 +117,24 @@ class frb_h8(object):
             print(page_body)
             print('\n')
 
+    def search(self, page, tsname: str):
+        i_ts = 0
+        for i, ts in enumerate(page.value):
+            if ts.name == tsname:
+                i_ts = i
+        return i_ts
 
-class database:
+    def merge(self, tsname: str, multi_index=False):
+        df_list = []
+        for page in self.pages:
+            ts = page.value[self.search(page, tsname)].value
+            ts.columns = [tsname + ': ' + page.category]
+            df_list.append(ts)
+        df = pd.concat(df_list, axis=1)
+        return df
+
+
+class database(object):
 
     def __init__(self,
                  database: str = None,

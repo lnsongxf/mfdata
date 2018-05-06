@@ -42,4 +42,4 @@ class dates:
         for before, after in zip(before, after):
             indexlist += [before + datetime.timedelta(days=x)
                           for x in range(0, (after - before).days)]
-        return df.loc[indexlist, :]
+        return df.loc[df.index.intersection(indexlist), :]
