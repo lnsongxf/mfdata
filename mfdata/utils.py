@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib import rcParams
 from itertools import cycle
+from mfdata.dates import *
 
 '''
 Plot modules
@@ -11,13 +12,10 @@ Plot modules
 
 
 class plot:
-    last_day = '2018-04-27'
-    recession_end = pd.to_datetime('2009-06-01', yearfirst=True)
-    TaperTantrum = pd.to_datetime('2015-05-23', yearfirst=True)
-    Feb2018 = pd.to_datetime('2018-02-01', yearfirst=True)
 
-    def __init__(self):
-        return None
+    fed_dates = dates()
+    recession_end = fed_dates.recession_end
+    last_day = fed_dates.last_day
 
     def series_plot(self,
                     df,
@@ -93,8 +91,10 @@ Helper functions
 '''
 
 
-def rate_of_change(x, lag):
-    return 100 * (x - x.shift(periods=lag, axis='index')) / x
+def _change(x, cols, lag):
+    diff = x[cols] - x[cols].shift(periods=lag, axis='index')
+    rate = diff.iloc[1:] / [cols].shift(periods=lag, axis='index').iloc[1:] - 1
+    return diff.iloc[1:], rate * 100
 
 
 def normalize(x):

@@ -8,10 +8,14 @@ class dates:
     def __init__(self):
         FOMC = pd.read_csv('FOMC.csv')['FOMC'].tolist()
         self.FOMC = pd.to_datetime(FOMC, yearfirst=True)
+        self.last_day = '2018-04-27'
+        self.recession_end = pd.to_datetime('2009-06-01', yearfirst=True)
+        self.TaperTantrum = pd.to_datetime('2015-05-23', yearfirst=True)
+        self.Feb2018 = pd.to_datetime('2018-02-01', yearfirst=True)
 
     # find the subsample before and after the FOMC meetings
 
-    def FOMC_sample(self, df, window: int):
+    def FOMC_sample(self, df, window: int = 1):
         '''
         Input:
             df: a pandas.Dataframe object contains the full sample
@@ -24,7 +28,7 @@ class dates:
         '''
 
         w = datetime.timedelta(weeks=window)
-        after = pd.to_datetime([d + w for d in self.FOMC], yearfirst=True)
+        after = pd.to_datetime([d + 2 * w for d in self.FOMC], yearfirst=True)
         before = pd.to_datetime([d - w for d in self.FOMC], yearfirst=True)
 
         indexlist = []
