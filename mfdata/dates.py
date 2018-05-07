@@ -6,7 +6,7 @@ import pandas as pd
 class dates:
 
     def __init__(self):
-        FOMC = pd.read_csv('FOMC.csv').tolist()
+        FOMC = pd.read_csv('FOMC.csv')['FOMC'].tolist()
         self.FOMC = pd.to_datetime(FOMC, yearfirst=True)
 
     # find the subsample before and after the FOMC meetings
