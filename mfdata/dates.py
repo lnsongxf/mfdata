@@ -5,9 +5,10 @@ import pandas as pd
 
 class dates:
 
-    def __init__(self):
-        FOMC = pd.read_csv('FOMC.csv')['FOMC'].tolist()
-        self.FOMC = pd.to_datetime(FOMC, yearfirst=True)
+    def __init__(self, path_FOMC: str = None):
+        if path_FOMC is not None:
+            FOMC = pd.read_csv(path_FOMC)['FOMC'].tolist()
+            self.FOMC = pd.to_datetime(FOMC, yearfirst=True)
         self.last_day = '2018-04-27'
         self.recession_end = pd.to_datetime('2009-06-01', yearfirst=True)
         self.TaperTantrum = pd.to_datetime('2015-05-23', yearfirst=True)
@@ -28,8 +29,8 @@ class dates:
         '''
 
         w = datetime.timedelta(weeks=window)
-        after = pd.to_datetime([d + 2 * w for d in self.FOMC], yearfirst=True)
-        before = pd.to_datetime([d - w for d in self.FOMC], yearfirst=True)
+        after = pd.to_datetime([d + w for d in self.FOMC], yearfirst=True)
+        before = pd.to_datetime([d for d in self.FOMC], yearfirst=True)
 
         indexlist = []
         for before, after in zip(before, after):
