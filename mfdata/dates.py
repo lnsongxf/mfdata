@@ -16,7 +16,7 @@ class dates:
 
     # find the subsample before and after the FOMC meetings
 
-    def FOMC_sample(self, df, window: int = 1):
+    def FOMC_sample(self, df, window: list = [0, 1]):
         '''
         Input:
             df: a pandas.Dataframe object contains the full sample
@@ -28,9 +28,11 @@ class dates:
             for the window period specified
         '''
 
-        w = datetime.timedelta(weeks=window)
-        after = pd.to_datetime([d + w for d in self.FOMC], yearfirst=True)
-        before = pd.to_datetime([d for d in self.FOMC], yearfirst=True)
+        w = datetime.timedelta(weeks=1)
+        after = pd.to_datetime(
+            [d + window[1] * w for d in self.FOMC], yearfirst=True)
+        before = pd.to_datetime([d - window[0] * w
+                                 for d in self.FOMC], yearfirst=True)
 
         indexlist = []
         for before, after in zip(before, after):
