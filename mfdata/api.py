@@ -129,7 +129,9 @@ class frb_h8(dates, plot):
         df_list = []
         for page in self.pages:
             ts = page.value[self.search(page, tsname)].value
-            ts.columns = [tsname + ': ' + page.category]
+            firstletter = ''.join([word[0].upper()
+                                   for word in tsname.split(' ')])
+            ts.columns = [firstletter + '_' + page.category[:3]]
             df_list.append(ts)
         df = pd.concat(df_list, axis=1)
         return df
