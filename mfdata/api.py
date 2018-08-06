@@ -66,7 +66,7 @@ class frb_h8(dates, plot):
         for path in filepath:
 
             df = pd.read_csv(path)
-            col_names = df.columns
+            col_names = df.columns.values
             category, sa = col_names[1].split(',')[-2:]
             category = category.strip().title()
 
@@ -76,6 +76,26 @@ class frb_h8(dates, plot):
                 sa = 'SA'
 
             ts_list = []
+
+            col_names[2] = 'Bank credit: ' + col_names[2]
+
+            for iname in range(3, 9):
+                col_names[iname] = 'Bank credit: Securities in bank credit: ' \
+                    + col_names[iname]
+
+            col_names[9] = 'Bank credit: ' + col_names[9]
+
+            for iname in range(10, 28):
+                col_names[iname] = 'Bank credit: Loans and leases in bank credit: ' \
+                    + col_names[iname]
+
+            col_names[28] = 'Bank credit: Allowance for loan and lease losses'
+
+            col_names[35] = 'Deposits: ' + col_names[35]
+            col_names[36] = 'Deposits: ' + col_names[36]
+
+            df.columns = col_names
+
             for col in col_names[1:]:
                 family = col.split(',')[0].split(':')
                 family = list(map(lambda x: x.strip(), family))
