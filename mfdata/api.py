@@ -3,6 +3,7 @@ import pandas as pd
 from fredapi import Fred
 from mfdata.utils import *
 from mfdata.dates import *
+import functools
 
 
 class ts(object):
@@ -90,7 +91,7 @@ class frb_h8(dates, plot):
                     + col_names[iname]
 
             col_names[28] = 'Bank credit: Allowance for loan and lease losses'
-
+            col_names[30] = 'Total fed funds sold and reverse repo'
             col_names[35] = 'Deposits: ' + col_names[35]
             col_names[36] = 'Deposits: ' + col_names[36]
 
@@ -156,6 +157,26 @@ class frb_h8(dates, plot):
         df = pd.concat(df_list, axis=1)
         return df
 
+    def combine(self, pages, terms):
+        n = 0
+        levels = [(a.category.split(' ')[0], b) for a in pages for b in terms]
+        columns = pd.MultiIndex.from_tuples(levels, names=['group', 'series'])
+
+        for page in pages:
+            tslist = [page.value[self.search(
+                page, name)].value for name in terms]
+            tempdf = functools.reduce(
+                (lambda x, y: pd.merge(x, y, left_index=True, right_index=True,
+                                       how='inner')), tslist)
+            if n == 1:
+                df = df.merge(tempdf, left_index=True,
+                              right_index=True, how='inner')
+            else:
+                df = tempdf
+            n = 1
+        df.columns = columns
+        return df
+
 
 class dtcc_repo(dates, plot):
 
@@ -181,6 +202,7 @@ class database(object):
         self.database = database
         self.var_list = var_list  # for simple request in FRED
         self.key = key  # the form depends on the database we use
+        self.fred = Fred(api_key=self.key)
 
     def fetch(self):
         '''
@@ -188,6 +210,9 @@ class database(object):
 
         Return
         '''
+
+        fred = self.fred
+
         if self.key is None:
             import textwrap
             raise ValueError(textwrap.dedent("""\
@@ -198,13 +223,6 @@ class database(object):
             raise ValueError(textwrap.dedent("""\
                     This function is intended for FRED, please try other
                     functions."""))
-
-        var_list = self.var_list
-        ts_list = []
-        ts = None
-        fred = Fred(self.key)
-        for var in var_list:
-            ts = fred.get_series(var)
-            ts.name = var
-            ts_list.append(ts)
-        return pd.concat(ts_list, axis=1)
+        dflist = [fred.get_series(var).to_frame(name = var).resample('D').mean() for var in self.var_list]
+        
+        return dflist
