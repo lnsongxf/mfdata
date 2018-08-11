@@ -223,6 +223,12 @@ class database(object):
             raise ValueError(textwrap.dedent("""\
                     This function is intended for FRED, please try other
                     functions."""))
+            
         dflist = [fred.get_series(var).to_frame(name = var).resample('D').mean() for var in self.var_list]
         
-        return dflist
+        df = dflist[0]
+        
+        for ts in dflist[1:]:
+            df = df.merge(ts, left_index = True, right_index = True, how = 'inner')
+        
+        return df
