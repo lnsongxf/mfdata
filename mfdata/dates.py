@@ -9,7 +9,7 @@ class dates:
         if path_FOMC is not None:
             FOMC = pd.read_csv(path_FOMC)['FOMC'].tolist()
             self.FOMC = pd.to_datetime(FOMC, yearfirst=True)
-        self.last_day = '2018-04-27'
+        self.last_day = '2018-08-08'
         self.recession_end = pd.to_datetime('2009-06-01', yearfirst=True)
         self.TaperTantrum = pd.to_datetime('2015-05-23', yearfirst=True)
         self.Feb2018 = pd.to_datetime('2018-02-01', yearfirst=True)
