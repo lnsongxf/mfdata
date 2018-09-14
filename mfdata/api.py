@@ -86,6 +86,9 @@ class frb_h8(dates, plot):
 
             col_names[9] = 'Bank credit: ' + col_names[9]
 
+            col_names[25] = 'All other loans and leases'
+            col_names[26] = 'All other loans and leases: Loans to nondepository financial institutions'
+            col_names[27] = 'All other loans and leases: Other loans not elsewhere classified'
             for iname in range(10, 28):
                 col_names[iname] = 'Bank credit: Loans and leases in bank credit: ' \
                     + col_names[iname]
